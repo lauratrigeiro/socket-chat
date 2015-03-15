@@ -1,23 +1,47 @@
 $(document).ready(function() {
 	var socket = io();
 
-	$('button').click(function() {
 
-	})
-	$('form').submit(function send_message() {
-		socket.emit('chat message', $('#m').val());
-		$('#m').val('');
-		return false;
+	$('#question-form').submit(function (e) {
+		e.preventDefault();
+		socket.emit('send question', {
+			username : username,
+			question : $('#question').val()
+		});
+//		$('#question').val('');
+		$('#question-container').hide();
+		$('#messages-container').show();
 	});
 
-	$("#m").keyup(function(e) {
-        if(e.keyCode == 13) {
-            $('form').submit(send_message());
-        }
-    });
-
-	socket.on('chat message', function(msg) {
-		$('#messages').append($('<li>').text(msg));
+	$('#message-form').submit(function (e) {
+		e.preventDefault();
+		send_message();
 	});
+
+	// $("#message").keyup(function(e) {
+ //        if(e.keyCode == 13) {
+ //            $('#message-form').submit();
+ //        }
+ //    });
+
+	socket.on('new message', function(data) {
+		var message_class;
+		if (data.username == username) {
+			message_class = 'my-message';
+		} else {
+			message_class = 'other-message';
+		}
+
+		$('#messages').append($('<li class="' + message_class + '">').text(data.username + ': ' + data.message));
+	});
+
+	function send_message() {
+		socket.emit('send message', {
+			username : username,
+			message : $('#message').val()
+		});
+
+		$('#message').val('');
+	}
 });
 

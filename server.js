@@ -20,12 +20,22 @@ app.get('/', function(req, res) {
 });
 
 io.on('connection', function(socket) {
-	console.log('a user connected');
-	socket.on('chat message', function(msg) {
-		io.emit('chat message', msg);
+//	console.log('a user connected');
+	socket.on('send question', function(data) {
+		io.emit('new message', {
+			username : data.username,
+			message  : data.question
+		});
+	});
+
+	socket.on('send message', function(data) {
+		io.emit('new message', {
+			username : data.username,
+			message  : data.message
+		});
 	});
 
 	socket.on('disconnect', function() {
-		console.log('user disconnected');
+//		console.log('user disconnected');
 	});
 });
